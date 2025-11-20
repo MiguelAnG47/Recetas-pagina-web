@@ -9,7 +9,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    {{-- Colores pastel personalizados --}}
     <style>
         body {
             background-color: #fffdf6;
@@ -50,20 +49,29 @@
                     <li class="nav-item"><a class="nav-link" href="{{ route('solicitudes.index') }}">Solicitar receta</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ route('recetas.index') }}">Mis recetas</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ route('perfil.index') }}">Perfil</a></li>
+
                     @auth
-                        <li class="nav-item"><a class="nav-link text-danger" href="{{ route('logout') }}">Salir</a></li>
+                        {{-- 🔥 Logout con POST --}}
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="#"
+                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Salir
+                            </a>
+                        </li>
+
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
                     @endauth
                 </ul>
             </div>
         </div>
     </nav>
 
-    {{-- Contenido dinámico --}}
     <main class="container mt-4">
         @yield('content')
     </main>
 
-    {{-- Footer --}}
     <footer>
         <p>Desarrollado por UNAB ESTUDENTS © {{ date('Y') }}</p>
     </footer>

@@ -35,6 +35,8 @@ Route::middleware('auth')->group(function () {
     // 👤 Perfil personalizado (tu vista)
     Route::get('/perfil', [ProfileController::class, 'index'])->name('perfil.index');
 
+    Route::post('/recetas/preferencias', [RecetaController::class, 'guardarPreferencias'])
+    ->name('recetas.guardarPreferencias');
   
 
 });

@@ -34,6 +34,9 @@ Route::middleware('auth')->group(function () {
 
     // 👤 Perfil personalizado (tu vista)
     Route::get('/perfil', [ProfileController::class, 'index'])->name('perfil.index');
+
+  
+
 });
 
 require __DIR__.'/auth.php';

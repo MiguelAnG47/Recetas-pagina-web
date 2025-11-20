@@ -1,0 +1,48 @@
+name: Ejecutar Tests de Laravel
+
+on:
+  push:
+    branches:
+      - main
+      - paula
+  pull_request:
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout código
+        uses: actions/checkout@v4
+
+      - name: 🔧 Configurar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, dom, fileinfo, sqlite
+
+      - name: 📦 Instalar dependencias Composer
+        run: composer install --no-progress --prefer-dist --no-interaction
+
+      - name: 🗄️ Crear base de datos SQLite para tests
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+
+      - name: 🔧 Configurar entorno de testing
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+
+      - name: 🧪 Ejecutar tests de PHPUnit
+        run: php artisan test --without-tty
+
+      - name: 📤 Subir logs si fallan los tests
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs
+          path: storage/logs

@@ -10,6 +10,8 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    protected $guard = 'web';
+
     protected $fillable = [
         'nombre',
         'apellido',

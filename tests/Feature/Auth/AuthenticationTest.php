@@ -19,36 +19,57 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
-        $user = User::factory()->create();
+        // Crear usuario real
+        $user = User::factory()->create([
+            'password' => bcrypt('password')
+        ]);
 
+        // Intentar login normal (sin actingAs)
         $response = $this->post('/login', [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
-        $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+
+        // Verificar login con guard real
+        $this->assertAuthenticated();
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'password' => bcrypt('password')
+        ]);
 
         $this->post('/login', [
             'email' => $user->email,
-            'password' => 'wrong-password',
+            'password' => 'clave-mal',
         ]);
 
+        // Debe seguir como invitado
         $this->assertGuest();
     }
 
     public function test_users_can_logout(): void
     {
-        $user = User::factory()->create();
+        // Crear usuario e iniciar sesión con POST
+        $user = User::factory()->create([
+            'password' => bcrypt('password')
+        ]);
 
-        $response = $this->actingAs($user)->post('/logout');
+        // Login normal
+        $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
 
-        $this->assertGuest();
+        // Logout (sin actingAs)
+        $response = $this->post('/logout');
+
         $response->assertRedirect('/');
+
+        // Verificar que ya NO está autenticado
+        $this->assertGuest();
     }
 }

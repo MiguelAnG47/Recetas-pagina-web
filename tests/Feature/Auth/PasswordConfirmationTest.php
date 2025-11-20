@@ -12,18 +12,36 @@ class PasswordConfirmationTest extends TestCase
 
     public function test_confirm_password_screen_can_be_rendered(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'password' => bcrypt('password')
+        ]);
 
-        $response = $this->actingAs($user)->get('/confirm-password');
+        // Autenticar con login real
+        $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password'
+        ]);
+
+        // Una vez logueado, acceder a la ruta
+        $response = $this->get('/confirm-password');
 
         $response->assertStatus(200);
     }
 
     public function test_password_can_be_confirmed(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'password' => bcrypt('password')
+        ]);
 
-        $response = $this->actingAs($user)->post('/confirm-password', [
+        // Login normal (sin actingAs)
+        $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        // Enviar confirmación
+        $response = $this->post('/confirm-password', [
             'password' => 'password',
         ]);
 
@@ -33,10 +51,19 @@ class PasswordConfirmationTest extends TestCase
 
     public function test_password_is_not_confirmed_with_invalid_password(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'password' => bcrypt('password')
+        ]);
 
-        $response = $this->actingAs($user)->post('/confirm-password', [
-            'password' => 'wrong-password',
+        // Login normal
+        $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        // Enviar contraseña incorrecta
+        $response = $this->post('/confirm-password', [
+            'password' => 'incorrecta',
         ]);
 
         $response->assertSessionHasErrors();
